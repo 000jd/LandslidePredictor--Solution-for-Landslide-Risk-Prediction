@@ -1,7 +1,9 @@
-import logging
+from src.config.logging_config import setup_logging
 import pandas as pd
 from typing import Tuple
 from typing_extensions import Annotated
+
+logger = setup_logging()
 
 class IngestData:
     def __init__(self, file_path: str):
@@ -16,7 +18,7 @@ def ingest_data(file_path: str) -> pd.DataFrame:
         df = ingest_data.get_data()
         return df
     except Exception as e:
-        logging.error(f"Error ingesting data: {e}")
+        logger.error(f"Error ingesting data: {e}")
         raise e
 
 def clean_data(
@@ -39,5 +41,5 @@ def clean_data(
         x_train, x_test, y_train, y_test = data_cleaning.handle_data()
         return x_train, x_test, y_train, y_test
     except Exception as e:
-        logging.error(f"Error cleaning data: {e}")
+        logger.error(f"Error cleaning data: {e}")
         raise e
