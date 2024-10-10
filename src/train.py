@@ -47,7 +47,7 @@ def train_model(
 if __name__ == "__main__":
     try:
         # Load and preprocess data
-        raw_data = ingest_data("/home/joydip/Documents/Devlopment/LandslidePredictor---End-to-End-MLOps-Solution-for-Landslide-Risk-Prediction/data/synthetic_landslide_data_2.csv")
+        raw_data = ingest_data("/data/synthetic_landslide_data_2.csv")
         x_train, x_test, y_train, y_test = clean_data(raw_data)
 
         # Set up model configuration
