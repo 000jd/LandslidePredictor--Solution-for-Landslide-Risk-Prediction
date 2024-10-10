@@ -9,7 +9,7 @@ from src.data.data_loader import ingest_data, clean_data
 from src.models.model_factory import get_model
 from src.optimize.tuner import HyperparameterTuner
 import logging
-
+from src.config.model_config import ModelNameConfig, MODEL_CONFIGS
 
 logger = setup_logging()
 
@@ -21,6 +21,7 @@ def train_model(
     config: ModelNameConfig,
 ) -> RegressorMixin:
     try:
+        model_config = MODEL_CONFIGS[config.model_name]
         model = get_model(config.model_name)
         
         if config.model_name == "lightgbm":
@@ -34,7 +35,8 @@ def train_model(
 
         if config.fine_tuning:
             best_params = tuner.optimize()
-            trained_model = model.train(x_train, y_train, **best_params)
+            model_config.update(best_params)
+            trained_model = model.train(x_train, y_train)
         else:
             trained_model = model.train(x_train, y_train)
         return trained_model
