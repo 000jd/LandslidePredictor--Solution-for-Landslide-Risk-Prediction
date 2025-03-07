@@ -11,6 +11,17 @@ from sklearn.impute import SimpleImputer
 
 logger = setup_logging()
 
+EXPECTED_FEATURES = [
+    'elevation', 'slope', 'aspect', 'rainfall_daily', 'rainfall_monthly',
+    'distance_to_faults', 'soil_depth', 'vegetation_density', 'earthquake_magnitude',
+    'soil_moisture', 'previous_landslides', 'snow_melt', 'landslide_probability',
+    'lithology_basalt', 'lithology_granite', 'lithology_limestone', 
+    'lithology_sandstone', 'lithology_shale',
+    'land_use_agriculture', 'land_use_barren', 'land_use_forest', 
+    'land_use_grassland', 'land_use_urban',
+    'human_activity_high', 'human_activity_low', 'human_activity_medium'
+]
+
 class DataStrategy(ABC):
     @abstractmethod
     def handle_data(self, data: pd.DataFrame) -> Union[pd.DataFrame, pd.Series]:
@@ -83,17 +94,3 @@ class DataCleaning:
 
     def handle_data(self) -> Union[pd.DataFrame, pd.Series]:
         return self.strategy.handle_data(self.df)
-
-def clean_data(data: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
-    try:
-        preprocess_strategy = DataPreprocessStrategy()
-        data_cleaning = DataCleaning(data, preprocess_strategy)
-        preprocessed_data = data_cleaning.handle_data()
-
-        divide_strategy = DataDivideStrategy()
-        data_cleaning = DataCleaning(preprocessed_data, divide_strategy)
-        x_train, x_test, y_train, y_test = data_cleaning.handle_data()
-        return x_train, x_test, y_train, y_test
-    except Exception as e:
-        logger.error(f"Error cleaning data: {e}")
-        raise e

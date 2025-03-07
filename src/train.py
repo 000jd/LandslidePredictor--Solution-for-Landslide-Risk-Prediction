@@ -10,6 +10,7 @@ from src.models.model_factory import get_model
 from src.optimize.tuner import HyperparameterTuner
 import logging
 from src.config.model_config import ModelNameConfig, MODEL_CONFIGS
+from src.utils import save_model
 
 logger = setup_logging()
 
@@ -24,13 +25,6 @@ def train_model(
         model_config = MODEL_CONFIGS[config.model_name]
         model = get_model(config.model_name)
         
-        if config.model_name == "lightgbm":
-            mlflow.lightgbm.autolog()
-        elif config.model_name in ["randomforest", "linear_regression"]:
-            mlflow.sklearn.autolog()
-        elif config.model_name == "xgboost":
-            mlflow.xgboost.autolog()
-
         tuner = HyperparameterTuner(model, x_train, y_train, x_test, y_test)
 
         if config.fine_tuning:
@@ -39,11 +33,13 @@ def train_model(
             trained_model = model.train(x_train, y_train)
         else:
             trained_model = model.train(x_train, y_train)
+            
+        save_model(trained_model, config.model_name)
         return trained_model
     except Exception as e:
-        logging.error(f"Error in train_model: {e}")
+        logger.error(f"Error in train_model: {e}")
         raise e
-
+    
 if __name__ == "__main__":
     try:
         # Load and preprocess data

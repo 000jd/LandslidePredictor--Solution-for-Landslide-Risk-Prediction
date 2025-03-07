@@ -7,3 +7,4 @@ optuna
 typing-extensions
 joblib
 mlflow
+streamlit
