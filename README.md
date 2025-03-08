@@ -62,7 +62,7 @@ cd ..
 
 ## Project Structure
 
-- **data/**: Synthetic landslide data (e.g., synthetic_landslide_data_2.csv).
+- **data/**: Synthetic landslide data (e.g., synthetic_landslide_data.csv).
 - **src/**: Core source code.
   - **config/**: Model and logging configurations (model_config.py, logging_config.py).
   - **data/**: Data loading and preprocessing (data_loader.py, data_pipeline.py).
