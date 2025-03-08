@@ -2,7 +2,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Dict
+from typing import List, Optional, Dict
 import logging
 from fastapi import Depends, Request
 
@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 class ModelService:
     def __init__(self):
-        self.model = None
+        self.models = {}  # Dictionary to cache loaded models
+        self.current_model = None
+        self.model_dir = Path(__file__).parent.parent / "saved_models"
         self.feature_names = None
         self.current_model_type = None
         self.expected_features = [
@@ -24,25 +26,38 @@ class ModelService:
             'land_use_grassland', 'land_use_urban',
             'human_activity_high', 'human_activity_low', 'human_activity_medium'
         ]
+        
+    def get_available_models(self) -> List[str]:
+        """Get list of available model names"""
+        return [f.stem for f in self.model_dir.glob("*.pkl")]
 
-    def load_model(self, model_path: str = "saved_models/xgboost_20250306_193033.pkl"):
-        try:
-            self.model = joblib.load(Path(model_path))
-            self.current_model_type = Path(model_path).stem.split('_')[0]
+    def load_model(self, model_name: str):
+        """Load or get cached model"""
+        if model_name in self.models:
+            return self.models[model_name]
+        
+        model_path = self.model_dir / f"{model_name}.pkl"
+        if not model_path.exists():
+            raise FileNotFoundError(f"Model {model_name} not found")
             
-            if hasattr(self.model, 'feature_names_in_'):
-                self.feature_names = self.model.feature_names_in_.tolist()
-            else:
-                self.feature_names = self.expected_features
-                
-            logger.info(f"Loaded {self.current_model_type} model with features: {self.feature_names}")
+        try:
+            model = joblib.load(model_path)
+            self.models[model_name] = model
+            logger.info(f"Loaded model: {model_name}")
+            return model
         except Exception as e:
-            logger.error(f"Model loading failed: {e}")
+            logger.error(f"Error loading {model_name}: {e}")
             raise
-
-    def _preprocess_input(self, input_data: Dict) -> pd.DataFrame:
+        
+    def _preprocess_input(self, input_data: Dict, model) -> pd.DataFrame:
         # Convert input data to DataFrame
         df = pd.DataFrame([input_data])
+        
+        # Get expected features from model
+        if hasattr(model, 'feature_names_in_'):
+            expected_features = model.feature_names_in_.tolist()
+        else:
+            expected_features = self.expected_features
         
         # One-hot encode categorical variables
         categorical_mappings = {
@@ -52,27 +67,31 @@ class ModelService:
         }
         
         for field, categories in categorical_mappings.items():
-            value = input_data[field]
+            value = input_data.get(field)
+            if not value:
+                raise ValueError(f"Missing required field: {field}")
+                
             for category in categories:
                 df[f"{field}_{category}"] = 1 if value == category else 0
-                
-        # Ensure all expected features exist
-        for feature in self.expected_features:
+        
+        # Add missing features with 0 values
+        for feature in expected_features:
             if feature not in df.columns:
                 df[feature] = 0
-                
-        return df[self.feature_names]
+        
+        # Keep only expected features and order them
+        return df[expected_features]
 
-    def predict(self, input_data: Dict) -> float:
-        if not self.model:
-            raise ValueError("No model loaded")
-            
+    def predict(self, model_name: str, input_data: Dict) -> float:
+        """Make prediction with specified model"""
         try:
-            processed_data = self._preprocess_input(input_data)
-            prediction = self.model.predict(processed_data)
+            model = self.load_model(model_name)
+            processed_data = self._preprocess_input(input_data, model)
+            logger.info(f"Processed data columns: {processed_data.columns.tolist()}")
+            prediction = model.predict(processed_data)
             return float(np.clip(prediction[0], 0, 1))
         except Exception as e:
-            logger.error(f"Prediction error: {e}")
+            logger.exception("Prediction failed with error:")  # Log full traceback
             raise
 
 def get_model_service(request: Request) -> ModelService:

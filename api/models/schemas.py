@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
 class PredictionInput(BaseModel):
+    model_name: str = Field(..., example="xgboost_20250306_193033")
     elevation: float = Field(..., ge=0, le=10000)
     slope: float = Field(..., ge=0, le=90)
     aspect: float = Field(..., ge=0, le=360)
