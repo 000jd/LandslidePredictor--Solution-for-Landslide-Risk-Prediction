@@ -1,5 +1,7 @@
 # Landslide Predictor: Solution for Landslide Risk Prediction
 
+![Landslide Predictor Banner](images/banner.png)
+
 **Landslide Predictor** is a comprehensive machine learning project designed to predict landslide risks using synthetic data. This solution integrates exploratory data analysis (EDA), advanced machine learning models, a robust data preprocessing pipeline, a flexible training pipeline with optional hyperparameter tuning, a FastAPI-based prediction API, and plans for a Streamlit app for interactive deployment. By leveraging features such as terrain characteristics (e.g., elevation, slope), rainfall patterns, soil properties, and human activity, the project provides a scalable framework for landslide risk assessment.
 
 ## Features
