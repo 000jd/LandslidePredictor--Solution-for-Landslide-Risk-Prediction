@@ -76,6 +76,7 @@ cd ..
   - **routers/**: API endpoints (predictions.py).
 - **saved_models/**: Trained model files (e.g., xgboost_20250306_193033.pkl).
 - **tests/**: Unit tests (test_model.py, test_utils.py, test_data.py).
+- **notebooks/**: EDA notebook (EDA.ipynb).
 - **frontend/**: Vite.js application for the user interface.
   - **src/**: Frontend source code.
   - **public/**: Static assets.
