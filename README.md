@@ -15,6 +15,10 @@
 - **EDA**: Provides a Jupyter notebook for data exploration.
 - **Frontend**: Interactive Vite.js application for user-friendly access to predictions.
 
+## Project Life Cycle
+
+![Project Life Cycle](images/landslide-project-lifecycle.png)
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -57,7 +61,7 @@ Navigate to the frontend directory and install npm packages:
 ```bash
 cd frontend
 npm install
-cd ..
+npn run dev
 ```
 
 ## Project Structure
@@ -189,8 +193,6 @@ Response:
     "prediction": 0.75
 }
 ```
-
-A Streamlit app is planned for interactive use but is not yet implemented in the provided code.
 
 ## Testing
 
