@@ -158,7 +158,9 @@ uvicorn server:app --reload --host 0.0.0.0 --port 8000
 - **GET /api/v1/models**: Lists available models in saved_models/.
 - **POST /api/v1/predict**: Returns a landslide risk prediction for given inputs.
 
-## Usage
+## API documentation
+
+![Project Life Cycle](images/api-doc.png)
 
 ### API Prediction Example
 
